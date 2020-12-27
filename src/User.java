@@ -1,8 +1,8 @@
 public class User {
-    String username;
-    String password;
-    String address;
-    String phone;
+    private String username;
+    private String password;
+    private String address;
+    private String phone;
 
     public String getUsername() {
         return username;

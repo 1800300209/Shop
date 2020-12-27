@@ -15,9 +15,9 @@ public class Test {
             String password = sc.next();
             System.out.println("您输入的密码为：" + password);
 
-            File f = new File("src\\massage.xlsx");
-            ReadExcel read = new ReadExcel();
-            User user[] = read.readExcel(f);
+            File f = new File("D:\\Shop\\src\\Users.xlsx");
+            ReadUserExcel readUser = new ReadUserExcel();
+            User user[] = readUser.readExcel(f);
 
             for (int i = 0; i < user.length; i++) {
                 if (username.equals(user[i].getUsername()) && password.equals(user[i].getPassword())) {
@@ -29,6 +29,16 @@ public class Test {
                 flag=0;break;
             } else
                 System.out.println("登陆失败！");
+        }
+        File f = new File("D:\\Shop\\src\\Products.xlsx");
+        ReadProductExcel readProduct = new ReadProductExcel();
+        Product product[] = readProduct.readExcel(f);
+
+        for (int i = 0; i < product.length; i++) {
+            System.out.println("商品ID："+product[i].getId());
+            System.out.println("商品名："+product[i].getName());
+            System.out.println("商品价格："+product[i].getPrice());
+            System.out.println("商品描述："+product[i].getDesc());
         }
     }
 }
