@@ -7,13 +7,30 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 
 public class ReadProductExcel {
-    public Product[] readExcel(File file) {
+    public  void read() throws ClassNotFoundException, IllegalAccessException {
+        InputStream in=Class.forName("Test").getResourceAsStream("/Products.xlsx");
+        ReadProductExcel read = new ReadProductExcel();
+        Product products[] = read.readExcel(in);
+        Class productClass=Product.class;
+        Field[] fields=productClass.getDeclaredFields();
+        for(int j=0;j<products.length;j++){
+//            for(Field field:fields){
+//                field.setAccessible(true);
+//                System.out.println(field.getName()+": "+field.get(products[j]));
+//            }
+//            System.out.println("");
+            System.out.println("id:"+products[j].getId()+"    name:"+products[j].getName()+"    price:"+products[j].getPrice()+"    desc:"+products[j].getDesc());
+        }
+    }
+    public Product[] readExcel(InputStream in) {
         Product products[] = null;
         try {
-            XSSFWorkbook xw = new XSSFWorkbook(new FileInputStream(file));
+            XSSFWorkbook xw = new XSSFWorkbook(in);
             XSSFSheet xs = xw.getSheetAt(0);
             products = new Product[xs.getLastRowNum()];
             for (int j = 1; j <= xs.getLastRowNum(); j++) {
@@ -24,13 +41,15 @@ public class ReadProductExcel {
                     if (cell == null)
                         continue;
                     if (k == 0) {
-                        product.setId(this.getValue(cell));//给username属性赋值
+                        product.setId(this.getValue(cell));
                     } else if (k == 1) {
-                        product.setName(this.getValue(cell));//给password属性赋值
+                        product.setName(this.getValue(cell));
                     } else if (k == 2) {
-                        product.setPrice(Float.parseFloat(this.getValue(cell)));//给address属性赋值
+                        product.setPrice(Float.parseFloat(this.getValue(cell)));
                     } else if (k == 3) {
-                        product.setDesc(this.getValue(cell));//给phone属性赋值
+                        product.setNumber(Integer.parseInt(this.getValue(cell)));
+                    }else if (k == 4) {
+                        product.setDesc(this.getValue(cell));
                     }
                 }
                 products[j-1] = product;
@@ -71,5 +90,20 @@ public class ReadProductExcel {
                 break;
         }
         return value;
+    }
+    public Product getProductById(String i,InputStream in){
+        ReadProductExcel read = new ReadProductExcel();
+        Product products[] = read.readExcel(in);
+        Product product =new Product();
+        for(int j=0;j<products.length;j++){
+            if(products[j].getId().equals(i)){
+                product.setId(products[j].getId());
+                product.setName(products[j].getName());
+                product.setNumber(1);
+                product.setPrice(products[j].getPrice());
+                product.setDesc(products[j].getDesc());
+            }
+        }
+        return product;
     }
 }
