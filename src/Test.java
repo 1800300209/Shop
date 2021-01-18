@@ -13,31 +13,33 @@ public class Test {
     public static void main(String args[]) throws ClassNotFoundException, IllegalAccessException {
         int flag = 0;
         Scanner sc = new Scanner(System.in);
-//        while(flag==0) {
-//            System.out.println("请输入用户名：");
-//            String username = sc.next();
-//            System.out.println("您输入的用户名为：" + username);
-//
-//            System.out.println("请输入密码：");
-//            String password = sc.next();
-//            System.out.println("您输入的密码为：" + password);
-//
-//            File f = new File("D:\\Shop\\src\\Users.xlsx");
-//            InputStream in=Class.forName("Test").getResourceAsStream("Users.xlsx");
-//            ReadUserExcel readUser = new ReadUserExcel();
-//            User user[] = readUser.readExcel(in);
-//
-//            for (int i = 0; i < user.length; i++) {
-//                if (username.equals(user[i].getUsername()) && password.equals(user[i].getPassword())) {
-//                    flag++;
-//                }
-//            }
-//            if (flag > 0) {
-//                System.out.println("登陆成功！");
-//                flag=0;break;
-//            } else
-//                System.out.println("登陆失败！");
-//        }
+        while(flag==0) {
+            System.out.println("请输入用户名：");
+            String username = sc.next();
+            System.out.println("您输入的用户名为：" + username);
+
+            System.out.println("请输入密码：");
+            String password = sc.next();
+            System.out.println("您输入的密码为：" + password);
+
+            File f = new File("D:\\Shop\\src\\Users.xlsx");
+            InputStream in=Class.forName("Test").getResourceAsStream("Users.xlsx");
+            ReadUserExcel readUser = new ReadUserExcel();
+            User user[] = readUser.readExcel(in);
+
+            for (int i = 0; i < user.length; i++) {
+                if (username.equals(user[i].getUsername()) && password.equals(user[i].getPassword())) {
+                    flag++;
+                }
+            }
+            if (flag > 0) {
+                System.out.println("登陆成功！");
+                flag=0;break;
+            } else
+                System.out.println("登陆失败！");
+        }
+        ReadProductExcel r=new ReadProductExcel();
+        r.read();
         int choose=0;
         while(true){
             System.out.println("继续购物请按1");
@@ -60,8 +62,8 @@ public class Test {
             }
             if(choose==3){
                 if(carts[0]!=null){
-                    double d=sum(carts);
-                    System.out.println("您的订单总价为："+d);
+//                    double d=sum(carts);
+//                    System.out.println("您的订单总价为："+d);
                     createXL(carts);
                 }
                 else {
@@ -69,6 +71,7 @@ public class Test {
                 }
             }
             if(choose==4){
+                System.out.println("退出成功！");
                 break;
             }
         }
@@ -119,7 +122,6 @@ public class Test {
             }
             // 在索引0的位置创建行（最顶端的行）
             HSSFRow[] row =new HSSFRow[length+2];
-            System.out.println(row.length);
             //在索引0的位置创建单元格（左上端）
             HSSFCell[][] cell =new HSSFCell[length+2][5];
             row[0] = sheet.createRow((short)0);
