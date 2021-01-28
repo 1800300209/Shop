@@ -1,15 +1,23 @@
 import java.io.File;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Scanner;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import java.io.FileOutputStream;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class Test {
     static int count=0;
     static Product[] carts = new Product[10];
+    static Order[] orders = new Order[10];
+    static String[] date=new String[10];
+    static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    static String usern=null;
     public static void main(String args[]) throws ClassNotFoundException, IllegalAccessException {
         int flag = 0;
         Scanner sc = new Scanner(System.in);
@@ -29,6 +37,7 @@ public class Test {
 
             for (int i = 0; i < user.length; i++) {
                 if (username.equals(user[i].getUsername()) && password.equals(user[i].getPassword())) {
+                    usern=username;
                     flag++;
                 }
             }
@@ -62,9 +71,9 @@ public class Test {
             }
             if(choose==3){
                 if(carts[0]!=null){
-//                    double d=sum(carts);
-//                    System.out.println("您的订单总价为："+d);
-                    createXL(carts);
+                    sum(carts);
+                    Order[] o=toorder(carts);
+                    createXL(o);
                 }
                 else {
                     System.out.println("您的购物车内无商品!");
@@ -88,18 +97,21 @@ public class Test {
         if(product.getId()!=null){
             System.out.println("要购买的商品的价格："+product.getPrice());
             int flag=0;
-            if(count>0){
-                    for(int i=0;i<count;i++){
-                        if(carts[i].getId().equals(product.getId())){
-                            carts[i].setNumber(carts[i].getNumber()+1);
-                            flag++;
-                        }
-                    }
-                    if(flag==0){
-                        carts[count++]=product;
+            if(count>0){    //购物车内有商品
+                for(int i=0;i<count;i++){       //判断该商品是否已在购物车内
+                    if(carts[i].getId().equals(product.getId())){       //该商品在购物车内，数量加一
+                        date[i]=df.format(new Date());
+                        carts[i].setNumber(carts[i].getNumber()+1);
+                        flag++;
                     }
                 }
-            else {
+                if(flag==0){        //该商品不在购物车内
+                    date[count]=df.format(new Date());
+                    carts[count++]=product;
+                }
+            }
+            else {   //购物车内无商品
+                date[count]=df.format(new Date());
                 carts[count++]=product;
             }
         }
@@ -107,42 +119,40 @@ public class Test {
             System.out.println("该商品不存在！");
         }
     }
-    public static void createXL(Product[] p){
+    public static void createXL(Order[] o){
         /** Excel 文件要存放的位置，假定在D盘下*/
         String outputFile = "D:\\Shop\\src\\carts.xlsx";
         try {
             HSSFWorkbook workbook = new HSSFWorkbook();
             HSSFSheet sheet = workbook.createSheet("订单");
-            String[] s={"id","name","price","number","desc"};
+            String[] str={"用户","商品","购买数量","商品总价","实付款","下单时间"};
             int length=0;
-            for(int i=0;i<p.length;i++){
-                if(p[i]!=null){
+            for(int i=0;i<o.length;i++){
+                if(o[i]!=null){
                     length++;
                 }
             }
             // 在索引0的位置创建行（最顶端的行）
-            HSSFRow[] row =new HSSFRow[length+2];
+            HSSFRow[] row =new HSSFRow[length+1];
             //在索引0的位置创建单元格（左上端）
-            HSSFCell[][] cell =new HSSFCell[length+2][5];
+            HSSFCell[][] cell =new HSSFCell[length+1][6];
             row[0] = sheet.createRow((short)0);
-            for(int j=0;j<5;j++){
+            for(int j=0;j<6;j++){
                 cell[0][j] = row[0].createCell((short)j);
-                cell[0][j].setCellValue(s[j]);
+                cell[0][j].setCellValue(str[j]);
             }
             for(int i=1;i<length+1;i++){
                 row[i] = sheet.createRow((short)i);
-                for(int j=0;j<5;j++){
+                for(int j=0;j<6;j++){
                     cell[i][j] = row[i].createCell((short)j);
                 }
-                cell[i][0].setCellValue(p[i-1].getId());
-                cell[i][1].setCellValue(p[i-1].getName());
-                cell[i][2].setCellValue(p[i-1].getPrice());
-                cell[i][3].setCellValue(p[i-1].getNumber());
-                cell[i][4].setCellValue(p[i-1].getDesc());
+                cell[i][0].setCellValue(o[i-1].getUsername());
+                cell[i][1].setCellValue(o[i-1].getName());
+                cell[i][2].setCellValue(o[i-1].getNumber());
+                cell[i][3].setCellValue(o[i-1].getTotal_price());
+                cell[i][4].setCellValue(o[i-1].getUntil_price());
+                cell[i][5].setCellValue(o[i-1].getTime());
             }
-            row[length+1] = sheet.createRow((short)length+1);
-            cell[length+1][0] = row[length+1].createCell((short)0);
-            cell[length+1][0].setCellValue("订单总价为："+sum(p));
             // 在单元格中输入一些内容
             // 新建一输出文件流
             FileOutputStream fOut = new FileOutputStream(outputFile);
@@ -167,5 +177,24 @@ public class Test {
             }
         }
         return d;
+    }
+    public static Order[] toorder(Product[] p){
+        int length=0;
+        for(int i=0;i<p.length;i++){
+            if(p[i]!=null){
+                length++;
+            }
+        }
+        Order[] o=new Order[length];
+        for(int j=0;j<length;j++){
+            o[j]=new Order();
+            o[j].setUsername(usern);
+            o[j].setName(p[j].getId());
+            o[j].setNumber(p[j].getNumber());
+            o[j].setTotal_price(p[j].getNumber()*p[j].getPrice());
+            o[j].setUntil_price(p[j].getNumber()*p[j].getPrice());
+            o[j].setTime(date[j]);
+        }
+        return o;
     }
 }
