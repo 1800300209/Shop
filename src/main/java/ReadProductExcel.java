@@ -89,7 +89,7 @@ public class ReadProductExcel {
         }
         return value;
     }
-    public Product getProductById(String i,InputStream in){
+    public Product getProductById(String i,InputStream in,int n){
         ReadProductExcel read = new ReadProductExcel();
         Product products[] = read.readExcel(in);
         Product product =new Product();
@@ -97,7 +97,7 @@ public class ReadProductExcel {
             if(products[j].getId().equals(i)){
                 product.setId(products[j].getId());
                 product.setName(products[j].getName());
-                product.setNumber(1);
+                product.setNumber(n);
                 product.setPrice(products[j].getPrice());
                 product.setDesc(products[j].getDesc());
             }

@@ -92,15 +92,17 @@ public class Test {
         inProduct=Class.forName("Test").getResourceAsStream("Products.xlsx");
         System.out.println("请输入物品id将其加入购物车：");
         String x = sc.next();
-        Product product=r.getProductById(x,inProduct);
+        System.out.println("请输入购买该商品的数量：");
+        int n=sc.nextInt();
+        Product product=r.getProductById(x,inProduct,n);
         if(product.getId()!=null){
-            System.out.println("要购买的商品的价格："+product.getPrice());
+            System.out.println("要购买的商品的总价为："+product.getPrice()*n);
             int flag=0;
             if(count>0){    //购物车内有商品
                 for(int i=0;i<count;i++){       //判断该商品是否已在购物车内
                     if(carts[i].getId().equals(product.getId())){       //该商品在购物车内，数量加一
                         date[i]=df.format(new Date());
-                        carts[i].setNumber(carts[i].getNumber()+1);
+                        carts[i].setNumber(carts[i].getNumber()+n);
                         flag++;
                     }
                 }
